@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import ttk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+import numpy as np
+from appFunctions import *
 
 class App (tk.Tk):
     def __init__(self):
@@ -26,12 +28,15 @@ class FrameTop(ttk.Frame):
         self.creat_layout()
         
     def creat_widgets(self):
-        self.fig, self.ag = plt.subplots()
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self)
-        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-    
+        self.figCC, self.axCC = plt.subplots()
+        self.axCC.set_ylabel('Porcentagem de carga')
+        self.axCC.set_xticks(range(24))
+        self.axCC.grid(True)
+        self.canvasCC = FigureCanvasTkAgg(self.figCC, master=self)
+        
     def creat_layout(self):
         self.place(relx=0.02, rely=0.02, relwidth=0.96, relheight=0.39)
+        self.canvasCC.get_tk_widget().place(relx=0, rely=0, relheight=1, relwidth=1)
         
         
 class FrameMid(ttk.Frame):
@@ -61,10 +66,10 @@ class FrameMid(ttk.Frame):
         self.potMbEntry.place(relx=0.22, rely=0, relwidth=0.1, relheight=1)
         self.potMcEntry.place(relx=0.37, rely=0, relwidth=0.1, relheight=1)
         
-class FrameBot(ttk.Frame):
+class FrameBot(ttk.Frame, FrameTop):
     def __init__(self, parent):
-        super().__init__(parent)
-        
+        ttk.Frame.__init__(parent)
+        FrameTop.__init__()
         self.creat_widgets()
         self.creat_layout()
         
@@ -74,15 +79,15 @@ class FrameBot(ttk.Frame):
         self.frameGraficoDeseq = ttk.Frame(self)
         self.frameBotoes = ttk.Frame(self)
         
-        #Botoes:
-        self.botaoRodar = ttk.Button(self.frameBotoes, text = 'Rodar')
-        self.botaoPlot = ttk.Button(self.frameBotoes, text = 'Curva de Carga')
-        
         #Gráfico:
-        self.fig, self.ag = plt.subplots()
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self.frameGraficoDeseq)
-        self.toolbar = NavigationToolbar2Tk(self.canvas, self.frameGraficoDeseq)
-        self.toolbar.update()
+        self.figDeseq, self.axDeseq = plt.subplots()
+        self.canvas = FigureCanvasTkAgg(self.figDeseq, master=self.frameGraficoDeseq)
+        self.axDeseq.set_ylabel('Desequilíbrio Máximo')
+        self.axDeseq.set_xticks(range(24))
+        self.axDeseq.set_yticks(np.arange(0,2.5,0.5))
+        self.axDeseq.grid(True)
+        self.toolbarDeseq = NavigationToolbar2Tk(self.canvas, self.frameGraficoDeseq)
+        self.toolbarDeseq.update()
         
         #Treeview:
         self.tree = ttk.Treeview(self.frameResults)
@@ -90,6 +95,9 @@ class FrameBot(ttk.Frame):
         self.treescrollx = ttk.Scrollbar(self.frameResults, orient="horizontal", command=self.tree.xview)
         self.tree.configure(yscrollcommand=self.treescrolly.set, xscrollcommand=self.treescrollx.set)
         
+        #Botoes:
+        self.botaoRodar = ttk.Button(self.frameBotoes, text = 'Rodar')
+        self.botaoPlot = ttk.Button(self.frameBotoes, text = 'Curva de Carga', command = lambda: FunBotaoPlotar(FrameTop.axCC, FrameTop.canvaCC))
         
     def creat_layout(self):
         self.place(relx=0.02, rely=0.48, relwidth=0.96, relheight=0.5)
