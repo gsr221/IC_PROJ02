@@ -1,7 +1,8 @@
-import matplotlib.pyplot as plt
-import numpy as np
+linkFile = "'D:/IC/Segundo_ano/34Bus/Run_IEEE34Mod1.dss'"
+seqVoltageDir = "D:/IC/Segundo_ano/34Bus/ieee34-1_EXP_SEQVOLTAGES.CSV"
+barra = 1
 
-curva_carga = [
+cc = [
     0.40,  # 00h
     0.35,  # 01h
     0.30,  # 02h
@@ -27,10 +28,3 @@ curva_carga = [
     0.70,  # 22h
     0.55   # 23h
 ]
-
-fig, ax = plt.subplots()
-x = np.arange(0,24,1)
-
-plt.plot(x,curva_carga)
-plt.grid(True)
-plt.show()
