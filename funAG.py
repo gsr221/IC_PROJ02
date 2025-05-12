@@ -7,7 +7,7 @@ class FunAG:
     def __init__(self, valorCC):
         self.dss = DSS()
         self.dss.compileFile(linkFile)
-        self.vlorCC = valorCC
+        self.valorCC = valorCC
         self.barras = self.dss.BusNames()
         self.pmList = []
         creator.create("fitnessMulti", base.Fitness, weights=(-1.0, ))
@@ -54,6 +54,7 @@ class FunAG:
         #==Cria um novo indivíduo==#
         for gene in range(len(indiv1)):
             #==calcula o delta==#
+            print(f"indiv1: {indiv1} - indiv2: {indiv2}")
             delta = abs(indiv1[gene] - indiv2[gene])
             #==Calcula o mínimo e o máximo==#
             minGene = int(min(indiv1[gene], indiv2[gene]) - alfa*delta)
@@ -75,6 +76,12 @@ class FunAG:
         g2 = random.randint(-self.pmList[1], self.pmList[1])
         indiv = [g1, 
                 g2]
+        return indiv
+    
+    
+    
+    def mutateFun(self, indiv):
+        indiv = self.criaCrom()
         return indiv
     
     

@@ -61,6 +61,7 @@ class DSS():
         #==Tenta ler o arquivo CSV com as tensões de sequência==#
         try:
             dfSeqVoltages = pd.read_csv(seqVoltageDir)
+            
         except FileNotFoundError:
             return pd.DataFrame()
         
