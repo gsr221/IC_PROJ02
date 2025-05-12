@@ -1,5 +1,6 @@
 import win32com.client
 import pandas as pd
+from consts import *
 
 class DSS():
     def __init__(self):
@@ -59,7 +60,7 @@ class DSS():
         
         #==Tenta ler o arquivo CSV com as tensões de sequência==#
         try:
-            dfSeqVoltages = pd.read_csv(c.seqVoltageDir)
+            dfSeqVoltages = pd.read_csv(seqVoltageDir)
         except FileNotFoundError:
             return pd.DataFrame()
         
@@ -69,7 +70,7 @@ class DSS():
     def alocaPot(self, barramento, listaPoten):
         #==Limpa a memória do openDSS e compila o arquivo original novamente==#
         self.clearAll()
-        self.compileFile(c.link_ieee13bus)
+        self.compileFile(linkFile)
         
         #==Ativa o barramento desejado==#
         self.dssCircuit.SetActiveBus(barramento)
