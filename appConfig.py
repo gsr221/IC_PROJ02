@@ -39,19 +39,19 @@ class MainFrame(ttk.Frame):
         
         #Grafico Curva de Carga:
         self.figCC, self.axCC = plt.subplots()
-        self.canvasCC = FigureCanvasTkAgg(self.figCC, master=self.frame_top)
+        self.canvasCC = FigureCanvasTkAgg(self.figCC, master=self.frameGraficoDeseq)
         self.axCC.set_ylabel('Porcentagem de carga')
         self.axCC.set_xticks(range(24))
         self.axCC.grid(True)
         
         #Gráfico Desequilibrio:
         self.figDeseq, self.axDeseq = plt.subplots()
-        self.canvas = FigureCanvasTkAgg(self.figDeseq, master=self.frameGraficoDeseq)
+        self.canvasDeseq = FigureCanvasTkAgg(self.figDeseq, master=self.frame_top)
         self.axDeseq.set_ylabel('Desequilíbrio Máximo')
         self.axDeseq.set_xticks(range(24))
         self.axDeseq.set_yticks(np.arange(0,2.5,0.5))
         self.axDeseq.grid(True)
-        self.toolbarDeseq = NavigationToolbar2Tk(self.canvas, self.frameGraficoDeseq)
+        self.toolbarDeseq = NavigationToolbar2Tk(self.canvasDeseq, self.frame_top)
         self.toolbarDeseq.update()
         
         #Entradas:
@@ -69,7 +69,7 @@ class MainFrame(ttk.Frame):
         self.tree.configure(yscrollcommand=self.treescrolly.set, xscrollcommand=self.treescrollx.set)
         
         #Botoes:
-        self.botaoRodar = ttk.Button(self.frameBotoes, text = 'Rodar', command=lambda: FunBotaoRoda(self.tree, self.potMaEntry, self.potMbEntry, self.potMcEntry))
+        self.botaoRodar = ttk.Button(self.frameBotoes, text = 'Rodar', command=lambda: FunBotaoRoda(self.tree, self.potMaEntry, self.potMbEntry, self.potMcEntry, self.axDeseq, self.canvasDeseq))
         self.botaoPlot = ttk.Button(self.frameBotoes, text = 'Curva de Carga', command=lambda: FunBotaoPlotar(self.axCC, self.canvasCC))
         
     def creat_layout(self):
@@ -101,7 +101,7 @@ class MainFrame(ttk.Frame):
         self.botaoRodar.place(relx=0.8, rely=0, relwidth=0.1, relheight=1)
         self.botaoPlot.place(relx=0.9, rely=0, relwidth=0.1, relheight=1)
         
-        self.canvas.get_tk_widget().place(relx=0, rely=0, relwidth=1, relheight=0.9)
+        self.canvasDeseq.get_tk_widget().place(relx=0, rely=0, relwidth=1, relheight=0.9)
         self.toolbarDeseq.place(relx=0, rely=0.9, relwidth=1, relheight=0.1)
         
         self.tree.place(relx=0, rely=0, relwidth=1, relheight=1)

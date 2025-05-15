@@ -4,10 +4,9 @@ from consts import *
 from funODSS import DSS
 
 class FunAG:
-    def __init__(self, valorCC):
+    def __init__(self):
         self.dss = DSS()
         self.dss.compileFile(linkFile)
-        self.valorCC = valorCC
         self.barras = self.dss.BusNames()
         self.pmList = []
         creator.create("fitnessMulti", base.Fitness, weights=(-1.0, ))
@@ -16,7 +15,7 @@ class FunAG:
       
         
     def FOBbat(self, indiv):
-        potsBat = indiv
+        potsBat = indiv[:2]
         potsBat.append(-potsBat[0]-potsBat[1])
         
         #========ALOCA A BATERIA========#
@@ -54,19 +53,15 @@ class FunAG:
         #==Cria um novo indivíduo==#
         for gene in range(len(indiv1)):
             #==calcula o delta==#
-            print(f"indiv1: {indiv1} - indiv2: {indiv2}")
             delta = abs(indiv1[gene] - indiv2[gene])
             #==Calcula o mínimo e o máximo==#
             minGene = int(min(indiv1[gene], indiv2[gene]) - alfa*delta)
             maxGene = int(max(indiv1[gene], indiv2[gene]) + alfa*delta)
-            if minGene != maxGene:
-                #==Sorteia o novo gene entre o mínimo e o máximo==# 
-                newIndiv1[gene] = random.randint(minGene, maxGene)
-                newIndiv2[gene] = random.randint(minGene, maxGene)
-            else:
-                newIndiv1[gene] = minGene
-                newIndiv2[gene] = minGene
+            #==Sorteia o novo gene entre o mínimo e o máximo==# 
+            newIndiv1[gene] = random.randint(minGene, maxGene)
+            newIndiv2[gene] = random.randint(minGene, maxGene)
             
+        #print(f"newIndiv1: {newIndiv1} - newIndiv2: {newIndiv2}")
         return newIndiv1, newIndiv2
     
     
@@ -74,20 +69,21 @@ class FunAG:
     def criaCromBat(self):
         g1 = random.randint(-self.pmList[0], self.pmList[0])
         g2 = random.randint(-self.pmList[1], self.pmList[1])
-        indiv = [g1, 
-                g2]
+        indiv = [g1, g2]
+        
         return indiv
     
     
     
     def mutateFun(self, indiv):
-        indiv = self.criaCrom()
+        indiv = self.criaCromBat()
         return indiv
     
     
     
-    def execAg(self, pms, probCruz=0.9, probMut=0, numGen=100, numRep=1):
+    def execAg(self, vCC, pms, probCruz=0.9, probMut=0, numGen=30, numRep=1):
             #Objeto toolbox
+            self.valorCC = vCC
             toolbox = base.Toolbox()
             #Lista com os valores de Potencia máxima por fase
             self.pmList = pms
@@ -112,7 +108,7 @@ class FunAG:
                 toolbox.register("pop", tools.initRepeat, list, toolbox.indiv)
 
                 #Criando uma população
-                populacao = toolbox.pop(n=30)
+                populacao = toolbox.pop(n=20)
 
                 hof = tools.HallOfFame(1)
                 result, log = algorithms.eaSimple(populacao, toolbox, cxpb=probCruz, mutpb=probMut, ngen=numGen, halloffame=hof, verbose=False)

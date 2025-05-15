@@ -4,7 +4,7 @@ import time as t
 import tkinter as tk
 from funAG import FunAG as AG
 import pandas as pd
-
+from funODSS import DSS
 
 #Limpa os dados da TreeView:
 def clearData(tv):
@@ -23,7 +23,7 @@ def FunBotaoPlotar(ax, canva):
     
     
 #Função que roda o algoritmo genético: 
-def FunBotaoRoda(tv, pma, pmc, pmb):
+def FunBotaoRoda(tv, pma, pmc, pmb, ax, canva):
     #Contador de tempo:
     t1 = t.time()
     #Lista com os valores máximos de potência:
@@ -40,29 +40,40 @@ def FunBotaoRoda(tv, pma, pmc, pmb):
     pms = [int(pm) for pm in pms]
     
     #Cria o dicionario com as potencias em cada fase, barramento e valor da fob:
-    dicResultadoAg = {'% Carga':[], 'Pot A':[], 'Pot B':[], 'Pot C':[], 'FOB':[]}
-    
+    dicResultadoAg = {'Hora':[], 'Pot A':[], 'Pot B':[], 'Pot C':[], 'FOB':[], 'Deseq Antes':[]}
+    ag = AG()
+    dss = DSS()
+    i=0
     #Rodando o algoritmo genético:
     for valCC in cc:
         #Variável q representa a hora do dia:
-        i=0
+        print(f'Rodando o algoritmo genético para a hora {i} com carga {valCC}')
         
-        #Objeto do algoritmo genético:
-        ag = AG(valCC)
+        dss.clearAll()
+        dss.compileFile(linkFile)
+        dss.solve(valCC)
+        df = dss.dfSeqVolt()
+        dicSecVoltages = df.to_dict(orient = 'list')
+        deseq = dicSecVoltages[' %V2/V1']
+        deseqMax = max(deseq)
+        
+        
         #Chama o método de execução do algoritmo genético:
-        results, log, dicMelhoresIndiv = ag.execAg(pms=pms, 
+        results, log, dicMelhoresIndiv = ag.execAg(vCC=valCC,
+                                                   pms=pms, 
                                                    numRep=1)
         
         #Adiciona os valores no dicionário:
         listaPotsBus = dicMelhoresIndiv['cromossomos']
         listaFobs = dicMelhoresIndiv['fobs']
-        dicResultadoAg['% Carga'].append(i)
+        dicResultadoAg['Hora'].append(i)
         dicResultadoAg['Pot A'].append([listaPotsBus[idx][0] for idx in range(len(listaPotsBus))])
         dicResultadoAg['Pot B'].append([listaPotsBus[idx][1] for idx in range(len(listaPotsBus))])
         dicResultadoAg['Pot C'].append([(-listaPotsBus[idx][0]-listaPotsBus[idx][1]) for idx in range(len(listaPotsBus))])
-        dicResultadoAg['FOB'].append(listaFobs)
+        dicResultadoAg['FOB'].append(listaFobs[0])
+        dicResultadoAg['Deseq Antes'].append(deseqMax)
         
-        i+=1
+        i=1+i
     
     #Printa o dicionário com os resultados:  
     print(dicResultadoAg)
@@ -80,5 +91,17 @@ def FunBotaoRoda(tv, pma, pmc, pmb):
         tv.insert("", "end", values=row)
     t2 = t.time()
     print(t2-t1)
+    
+    deseqMed = sum(dicResultadoAg['FOB']) / len(dicResultadoAg['FOB'])
+    
+    ax.clear()
+    ax.plot(np.arange(0,24,1), dicResultadoAg['FOB'], color='green', label='Desequilíbrios Max', linewidth=3)
+    ax.plot(np.arange(0,24,1), dicResultadoAg['Deseq Antes'], color='red', label='Desequilíbrios Antes', linewidth=3)
+    ax.axhline(y=deseqMed, color='red', linestyle='--', label='Desequilíbrio Médio')
+    ax.set_ylabel('Porcentagem de carga')
+    ax.set_xticks(range(24))
+    ax.set_yticks(np.arange(0,3.75,0.25))
+    ax.grid(True)
+    canva.draw()
     
     return None

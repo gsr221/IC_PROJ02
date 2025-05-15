@@ -1,6 +1,7 @@
-linkFile = "'D:/IC/Segundo_ano/34Bus/Run_IEEE34Mod1.dss'"
-seqVoltageDir = "D:/IC/Segundo_ano/34Bus/ieee34-1_EXP_SEQVOLTAGES.CSV"
-barra = 1
+linkFile = "'D:/IC/Segundo_ano/13Bus/IEEE13Nodeckt.dss'"
+seqVoltageDir = "D:/IC/Segundo_ano/13Bus/IEEE13Nodeckt_EXP_SEQVOLTAGES.CSV"
+barra = 671
+
 
 cc = [
     0.40,  # 00h
